@@ -1,24 +1,8 @@
 # vk-bingo
 
-## Project setup
-```
-npm install
-```
+*Игра на знание своих друзей по мотивам вашей беседы ВК.*
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+Данные для игры получаются из архива доступного по [ссылке](https://vk.com/data_protection?section=rules).
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Todo:
+- Собирать в БД не только картинки, но и репосты и видео.
