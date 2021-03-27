@@ -1,5 +1,5 @@
 <template>
-  <div class="card" v-if="card!==null">
+  <div class="card" v-if="card !== null">
     <img class="meme" v-bind:src="card.image">
     <h2>Кто скинул этот мем?</h2>
     <div class="answers">
@@ -82,13 +82,15 @@ export default {
   cursor: pointer;
 }
 
-.correct {
-  background-color: rgb(124, 230, 124);
-}
-.highlight_correct {
-  border: 1px solid rgb(124, 230, 124);
-}
-.wrong {
-  background-color: rgb(255, 71, 71);
+@keyframes correct-selected {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 </style>

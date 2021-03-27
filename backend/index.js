@@ -6,9 +6,14 @@ const MongoStore = require('connect-mongo')
 const cors = require('cors')
 require('dotenv').config()
 
-const {verifyCaptcha} = require('./verify-captcha')
-
-app.use(cors())
+app.use(cors({
+  origin: [
+    'http://localhost:8080',
+    'https://localhost:8080'
+  ],
+  credentials: true,
+  exposedHeaders: ['set-cookie']
+}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
@@ -23,13 +28,18 @@ app.use(session({
     client,
     dbName: process.env.DB_NAME
   }),
-  cookie: { maxAge: 1000 * 60 * 60 * 24 }
+  cookie: { 
+    secure: false,
+    maxAge: 1000 * 60 * 60 * 24
+  }
 }))
 
 client.connect()
 
 app.post('/auth', async (req, res) => {
-  verifyCaptcha(req, res, async () => {
+  if (req.session.loggedIn) {
+    res.status(200).send("Logged in")
+  } else {
     try {
       const pass = req.body.pass
       if (pass.toLowerCase() === process.env.PASSWORD) {
@@ -42,7 +52,7 @@ app.post('/auth', async (req, res) => {
       console.log("Error: " + e)
       res.status(500).send()
     }
-  })
+  }
 })
 
 app.get('/card', async (req, res) => {
