@@ -1,5 +1,5 @@
 <template>
-  <h1>🎰 Flex Bingo 🎰</h1>
+  <h1>🎰 Флекспатрульное Бинго 🎰</h1>
   <Login id="login" @loggedIn="login" v-show="!loggedIn" />
   <Game id="game" v-if="loggedIn" />
 </template>
@@ -43,11 +43,11 @@ body {
 }
 
 #game {
-  margin: auto;
   margin-bottom: 100px;
 }
 
 .correct {
+  color: black;
   background-color: rgb(124, 230, 124) !important;
 }
 .highlight_correct {
@@ -55,5 +55,12 @@ body {
 }
 .wrong {
   background-color: rgb(255, 71, 71) !important;
+}
+
+@media only screen and (max-width: 520) {
+  h1 {
+    display: none;
+    font-size: 10px;
+  }
 }
 </style>

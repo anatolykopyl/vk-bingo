@@ -1,50 +1,67 @@
 <template>
-  <div class="card" v-if="card !== null">
+  <div class="card" v-if="card !== null" v-on:click="nextCard()" v-bind:class="{clickable: showResult}">
     <img class="meme" v-bind:src="card.image">
     <h2>Кто скинул этот мем?</h2>
-    <div class="answers">
-      <span class="option" v-for="name in options" :key="name" v-on:click="selectAnswer(name)"
-      v-bind:class="{
-        correct: correctAnswer && selectedAnswer === name, 
-        wrong: selectedAnswer === name && !correctAnswer, 
-        highlight_correct: correctAnswer !== null && name === card.name
-      }">
-        {{ name }}
-      </span>
+    <div class="interactive">
+      <transition name="fade-answers">
+        <List v-if="selectedAnswer === null" 
+        :options="options" @selectedAnswer="selectAnswer" />
+      </transition>
+      <transition name="spin-result">
+        <Result v-if="showResult" 
+        :name="card.name" :selectedName="selectedAnswer" :date="card.date" :correct="correctAnswer" />
+      </transition>
     </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import List from './List.vue'
+import Result from './Result.vue'
 
 export default {
   name: 'Game',
+  components: {
+    List,
+    Result
+  },
   data() {
     return {
       options: null,
       card: null,
       correctAnswer: null,    // True or False
-      selectedAnswer: null    // Чье-то имя
+      selectedAnswer: null,   // Чье-то имя
+      showResult: false
     }
   },
   methods: {
     getCard: function() {
+      this.correctAnswer = null
+      this.selectedAnswer = null
+      this.showResult = false
       axios
-        .get('http://localhost:3000/card')
+        .get(process.env.VUE_APP_BACKEND + '/card')
         .then(response => (this.card = response.data))
     },
-    selectAnswer: function(selection) {
-      if (this.correctAnswer === null) {
-        this.correctAnswer = selection === this.card.name
-        this.selectedAnswer = selection
+    nextCard: function() {
+      if (this.showResult) {
+        this.getCard()
       }
+    },
+    selectAnswer: function(selection) {
+      this.correctAnswer = selection === this.card.name
+      this.selectedAnswer = selection
+      let innerThis = this
+      setTimeout(function() {
+          innerThis.showResult = true
+      }, 800)
     }
   },
   mounted() {
     this.getCard()
     axios
-      .get('http://localhost:3000/options')
+      .get(process.env.VUE_APP_BACKEND + '/options')
       .then(response => (this.options = response.data))
   }
 }
@@ -52,11 +69,12 @@ export default {
 
 <style scoped>
 .card {
-  width: 50%;
+  width: 450px;
   padding: 18px;
   border-radius: 17px;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.6);
   background-color: #121212;
+  margin: auto;
 }
 
 .meme {
@@ -64,33 +82,33 @@ export default {
   border-radius: 8px;
 }
 
-.answers {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-}
-
-.option {
-  background-color: #5a5a5a;
-  border-radius: 6px;
-  margin: 3px;
-  padding: 5px 9px 5px 9px;
-  transition: transform 0.2s;
-}
-.option:hover {
-  transform: scale(1.06);
+.clickable {
   cursor: pointer;
 }
 
-@keyframes correct-selected {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    transform: scale(1.5);
-  }
-  100% {
-    transform: scale(1);
+.interactive {
+  position: relative;
+}
+
+.fade-answers-leave-active {
+  transition: all 0.8s ease;
+}
+.fade-answers-leave-to {
+  opacity: 0;
+  transform: scale(0.3);
+}
+
+.spin-result-enter-active {
+  transition: all 2s ease;
+}
+.spin-result-enter-from {
+  transform: scale(0.2);
+  transform: rotateY(120deg);
+}
+
+@media only screen and (max-width: 486) {
+  .card {
+    width: 100%;
   }
 }
 </style>

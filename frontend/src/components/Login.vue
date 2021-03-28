@@ -23,7 +23,7 @@ export default {
   methods: {
     login: function() {
       axios
-        .post('http://localhost:3000/auth', {
+        .post(process.env.VUE_APP_BACKEND + '/auth', {
           "pass": this.answer,
         })
         .then(response => {
@@ -34,7 +34,6 @@ export default {
   },
   mounted() {
     this.question = process.env.VUE_APP_QUESTION
-
     this.login()
   }
 }
