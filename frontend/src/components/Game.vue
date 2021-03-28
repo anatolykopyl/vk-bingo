@@ -13,9 +13,7 @@
       </transition>
     </div>
   </div>
-  <div v-else>
-    Загрузка...
-  </div>
+  <square-loader v-else :color="'#f3f3f3'" class="loader" />
 </template>
 
 <script>
@@ -23,11 +21,14 @@ import axios from 'axios'
 import List from './List.vue'
 import Result from './Result.vue'
 
+import SquareLoader from 'vue-spinner/src/SquareLoader.vue'
+
 export default {
   name: 'Game',
   components: {
     List,
-    Result
+    Result,
+    SquareLoader
   },
   data() {
     return {
@@ -110,6 +111,10 @@ export default {
 .spin-result-enter-from {
   transform: scale(0.2);
   transform: rotateY(120deg);
+}
+
+.loader {
+  margin-top: 100px;
 }
 
 @media screen and (max-width: 486px) {
