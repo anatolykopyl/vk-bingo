@@ -8,8 +8,7 @@ require('dotenv').config()
 
 app.use(cors({
   origin: [
-    'http://localhost:8080',
-    'https://localhost:8080'
+    process.env.FRONTEND
   ],
   credentials: true,
   exposedHeaders: ['set-cookie']
