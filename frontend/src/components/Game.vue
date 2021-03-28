@@ -13,6 +13,9 @@
       </transition>
     </div>
   </div>
+  <div v-else>
+    Загрузка...
+  </div>
 </template>
 
 <script>
@@ -42,10 +45,13 @@ export default {
       this.showResult = false
       axios
         .get(process.env.VUE_APP_BACKEND + '/card')
-        .then(response => (this.card = response.data))
+        .then(response => {
+          this.card = response.data
+          })
     },
     nextCard: function() {
       if (this.showResult) {
+        this.card = null
         this.getCard()
       }
     },

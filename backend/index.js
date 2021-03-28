@@ -42,7 +42,7 @@ app.post('/auth', async (req, res) => {
   } else {
     try {
       const pass = req.body.pass
-      if (pass.toLowerCase() === process.env.PASSWORD) {
+      if (pass && pass.toLowerCase() === process.env.PASSWORD) {
         req.session.loggedIn = true
         res.status(200).send("Logged in")
       } else {
