@@ -112,9 +112,10 @@ export default {
   transform: rotateY(120deg);
 }
 
-@media only screen and (max-width: 486) {
+@media screen and (max-width: 486px) {
   .card {
-    width: 100%;
+    width: 94%;
+    padding: 3%;
   }
 }
 </style>
