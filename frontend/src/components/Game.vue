@@ -63,6 +63,13 @@ export default {
       setTimeout(function() {
           innerThis.showResult = true
       }, 800)
+      axios
+        .post(process.env.VUE_APP_BACKEND + '/answer', {
+          'data': {
+            'correct': this.correctAnswer,
+            'selected': this.selectedAnswer
+          }
+        })
     }
   },
   mounted() {

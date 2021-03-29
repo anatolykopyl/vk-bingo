@@ -69,6 +69,20 @@ app.get('/card', async (req, res) => {
   }
 })
 
+app.post('/answer', (req, res) => {
+  if (req.session.loggedIn) {
+    try {
+      client.db(process.env.DB_NAME).collection('anwsers').insertOne(req.body.data)
+      res.status(200).send()
+    } catch (e) {
+      console.log("Error: " + e)
+      res.status(500).send()
+    }
+  } else {
+    res.status(403).send()
+  }
+})
+
 app.get('/options', async (req, res) => {
   if (req.session.loggedIn) {
     res.status(200).send(names)
