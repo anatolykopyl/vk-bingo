@@ -11,7 +11,7 @@ client = MongoClient(host="localhost", port=27017)
 db = client.vk_bingo
 
 for filename in os.listdir(DIRECTORY):
-  if filename.endswith(".html"):
+  if filename.startswith("UTF8") and filename.endswith(".html"):
     soup = BeautifulSoup(open(DIRECTORY+filename), "html.parser")
 
     for attch_desc in soup.find_all('div', attrs={'class': 'attachment__description'}):
