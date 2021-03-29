@@ -102,6 +102,8 @@ export default {
 
 .interactive {
   position: relative;
+  -webkit-perspective: 900000px;
+  perspective: 900000px;
 }
 
 .fade-answers-leave-active {
