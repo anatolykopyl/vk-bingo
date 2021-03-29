@@ -1,19 +1,21 @@
 <template>
-  <div class="card" v-if="card !== null" v-on:click="nextCard()" v-bind:class="{clickable: showResult}">
-    <img class="meme" v-bind:src="card.image">
-    <h2>Кто скинул этот мем?</h2>
-    <div class="interactive">
-      <transition name="fade-answers">
-        <List v-if="selectedAnswer === null" 
-        :options="options" @selectedAnswer="selectAnswer" />
-      </transition>
-      <transition name="spin-result">
-        <Result v-if="showResult" 
-        :name="card.name" :selectedName="selectedAnswer" :date="card.date" :correct="correctAnswer" />
-      </transition>
+  <div>
+    <div class="card" v-if="card !== null" v-on:click="nextCard()" v-bind:class="{clickable: showResult}">
+      <img class="meme" v-bind:src="card.image">
+      <h2>Кто скинул этот мем?</h2>
+      <div class="interactive">
+        <transition name="fade-answers">
+          <List v-if="selectedAnswer === null" 
+          :options="options" @selectedAnswer="selectAnswer" />
+        </transition>
+        <transition name="spin-result">
+          <Result v-if="showResult" 
+          :name="card.name" :selectedName="selectedAnswer" :date="card.date" :correct="correctAnswer" />
+        </transition>
+      </div>
     </div>
+    <square-loader v-else :color="'#f3f3f3'" class="loader" />
   </div>
-  <square-loader v-else :color="'#f3f3f3'" class="loader" />
 </template>
 
 <script>
@@ -34,6 +36,7 @@ export default {
     return {
       options: null,
       card: null,
+      oldCard: null,
       correctAnswer: null,    // True or False
       selectedAnswer: null,   // Чье-то имя
       showResult: false
@@ -48,7 +51,7 @@ export default {
         .get(process.env.VUE_APP_BACKEND + '/card')
         .then(response => {
           this.card = response.data
-          })
+        })
     },
     nextCard: function() {
       if (this.showResult) {
@@ -62,7 +65,8 @@ export default {
       let innerThis = this
       setTimeout(function() {
           innerThis.showResult = true
-      }, 800)
+      }, 805)
+      this.oldCard = this.card
       axios
         .post(process.env.VUE_APP_BACKEND + '/answer', {
           'data': {
