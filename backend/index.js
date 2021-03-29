@@ -35,6 +35,36 @@ app.use(session({
 
 client.connect()
 
+// Выравнивание вероятности
+let dropProb = {} // Объект хранящий вероятности с которой карта каждого участника отбрасывается
+client.db(process.env.DB_NAME).collection('cards').aggregate([
+  {
+    '$group': {
+      '_id': '$name', 
+      'count': {
+        '$sum': 1
+      }
+    }
+  }
+]).toArray().then((memeCount) => {
+  client.db(process.env.DB_NAME).collection('cards').countDocuments().then((totalCount) => {
+    let quota, quotaTimes
+    quota = totalCount/memeCount.length  // Квота мемов на человека
+    console.log(totalCount + " мемов всего. Квота: " + quota)
+    memeCount.forEach((n) => {
+      // Во сколько раз превышена квота:
+      // (колич. человек в конфе * колич. мемов данного человека / мемов всего)
+      quotaTimes = memeCount.length*n.count/totalCount
+      if (quotaTimes > 1) {
+        dropProb[n._id] = 1 - (1/quotaTimes)
+      } else {
+        dropProb[n._id] = 0
+      }
+      console.log(n._id + " ["+n.count+"]: " + dropProb[n._id])
+    })
+  })
+})
+
 app.post('/auth', async (req, res) => {
   if (req.session.loggedIn) {
     res.status(200).send("Logged in")
@@ -57,8 +87,12 @@ app.post('/auth', async (req, res) => {
 app.get('/card', async (req, res) => {
   if (req.session.loggedIn) {
     try {
-      let card = await client.db(process.env.DB_NAME).collection('cards').aggregate([{ $sample: { size: 1 } }]).toArray()
-      card = card[0]
+      let card
+      // Тянем карты и отбрасываем их в соответствии с их вероятностью отбрасывания
+      do {
+        card = await client.db(process.env.DB_NAME).collection('cards').aggregate([{ $sample: { size: 1 } }]).toArray()
+        card = card[0]
+      } while (Math.random() < dropProb[card.name])
       res.status(200).send(card)
     } catch (e) {
       console.log("Error: " + e)
