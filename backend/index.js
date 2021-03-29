@@ -72,7 +72,7 @@ app.get('/card', async (req, res) => {
 app.post('/answer', (req, res) => {
   if (req.session.loggedIn) {
     try {
-      client.db(process.env.DB_NAME).collection('anwsers').insertOne(req.body.data)
+      client.db(process.env.DB_NAME).collection('answers').insertOne(req.body.data)
       res.status(200).send()
     } catch (e) {
       console.log("Error: " + e)
