@@ -68,7 +68,7 @@ div {
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.6);
 }
 
-@media screen and (max-width: 486px) {
+@media screen and (max-width: 520px) {
   div {
     width: 100%;
     position: relative;

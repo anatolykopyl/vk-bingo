@@ -70,4 +70,11 @@ button {
   padding: 5px 8px 5px 8px;
   cursor: pointer;
 }
+
+@media only screen and (max-width: 520px) {
+  div {
+    width: 100%;
+    padding: 40px 0px 40px 0px;
+  }
+}
 </style>

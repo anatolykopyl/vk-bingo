@@ -144,7 +144,7 @@ export default {
   margin-top: 100px;
 }
 
-@media screen and (max-width: 486px) {
+@media screen and (max-width: 520px) {
   .card {
     width: 94%;
     padding: 3%;

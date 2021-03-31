@@ -84,9 +84,6 @@ body {
   color: #121212;
   background-color: rgb(124, 230, 124) !important;
 }
-.highlight_correct {
-  border: 1px solid rgb(124, 230, 124);
-}
 .wrong {
   background-color: rgb(255, 71, 71) !important;
 }
