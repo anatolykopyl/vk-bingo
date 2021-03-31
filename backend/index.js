@@ -51,12 +51,21 @@ cardsCollection.aggregate([
 ]).toArray().then((memeCount) => {
   cardsCollection.countDocuments().then((totalCount) => {
     let quota, quotaTimes
+    let activeUsers = 0
+
     quota = totalCount/memeCount.length  // Квота мемов на человека
     console.log(totalCount + " мемов всего. Квота: " + quota)
+
+    // Подсчет количества активных пользователей
+    memeCount.forEach((n) => {
+      if (n.count > quota/10)
+        activeUsers++
+    })
+
     memeCount.forEach((n) => {
       // Во сколько раз превышена квота:
-      // (колич. человек в конфе * колич. мемов данного человека / мемов всего)
-      quotaTimes = memeCount.length*n.count/totalCount
+      // (колич. астивных человек в конфе * колич. мемов данного человека / мемов всего)
+      quotaTimes = activeUsers*n.count/totalCount
       if (quotaTimes > 1) {
         dropProb[n._id] = 1 - (1/quotaTimes)
       } else {
