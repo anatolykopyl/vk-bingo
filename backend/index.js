@@ -107,6 +107,18 @@ app.get('/card', async (req, res) => {
 
 app.post('/answer', (req, res) => {
   if (req.session.loggedIn) {
+    if (req.body.data.correct) {
+      if (req.session.right)
+        req.session.right++
+      else
+        req.session.right = 1
+    } else {
+      if (req.session.wrong)
+        req.session.wrong++
+      else
+        req.session.wrong = 1
+    }
+
     try {
       answersCollection.insertOne(req.body.data)
       res.status(200).send()
@@ -114,6 +126,18 @@ app.post('/answer', (req, res) => {
       console.log("Error: " + e)
       res.status(500).send()
     }
+  } else {
+    res.status(403).send()
+  }
+})
+
+app.get('/score', (req, res) => {
+  if (req.session.loggedIn) {
+    const scoreObj = {
+      "right": req.session.right,
+      "wrong": req.session.wrong
+    }
+    res.status(200).send(scoreObj)
   } else {
     res.status(403).send()
   }

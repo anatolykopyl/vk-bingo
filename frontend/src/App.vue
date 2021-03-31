@@ -1,11 +1,12 @@
 <template>
-  <h1>🎰 Флекспатрульное Бинго 🎰</h1>
+  <h1>🎱 Флекспатрульное Бинго 🎱</h1>
   <Login id="login" @loggedIn="login" v-show="!loggedIn" />
-  <Game id="game" v-if="loggedIn" />
+  <Game id="game" v-if="loggedIn" :score="score" />
   <a class="source" href="https://github.com/anatolykopyl/vk-bingo">Исходный код</a>
 </template>
 
 <script>
+import axios from 'axios'
 import Login from './components/Login.vue'
 import Game from './components/Game.vue'
 
@@ -17,12 +18,22 @@ export default {
   },
   data() {
     return {
-      loggedIn: null
+      loggedIn: null,
+      score: {
+        "right": 0, 
+        "wrong": 0
+      }
     }
   },
   methods: {
     login: function(success) {
       this.loggedIn = success
+      axios
+        .get(process.env.VUE_APP_BACKEND + '/score')
+        .then(response => {
+          if (Object.keys(response.data).length !== 0)
+            this.score = response.data
+        })
     }
   }
 }
@@ -80,10 +91,9 @@ body {
   background-color: rgb(255, 71, 71) !important;
 }
 
-@media only screen and (max-width: 520) {
-  h1 {
+@media only screen and (max-width: 520px) {
+  .source {
     display: none;
-    font-size: 10px;
   }
 }
 </style>
