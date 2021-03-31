@@ -108,15 +108,9 @@ app.get('/card', async (req, res) => {
 app.post('/answer', (req, res) => {
   if (req.session.loggedIn) {
     if (req.body.data.correct) {
-      if (req.session.right)
-        req.session.right++
-      else
-        req.session.right = 1
+      req.session.right++
     } else {
-      if (req.session.wrong)
-        req.session.wrong++
-      else
-        req.session.wrong = 1
+      req.session.wrong++
     }
 
     try {
@@ -133,6 +127,8 @@ app.post('/answer', (req, res) => {
 
 app.get('/score', (req, res) => {
   if (req.session.loggedIn) {
+    req.session.right = req.session.right || 0
+    req.session.wrong = req.session.wrong || 0
     const scoreObj = {
       "right": req.session.right,
       "wrong": req.session.wrong
