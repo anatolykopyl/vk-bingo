@@ -57,21 +57,21 @@ cardsCollection.aggregate([
     console.log(totalCount + " мемов всего. Квота: " + quota)
 
     // Подсчет количества активных пользователей
-    memeCount.forEach((n) => {
-      if (n.count > quota/10)
+    memeCount.forEach((person) => {
+      if (person.count > quota/10)
         activeUsers++
     })
 
-    memeCount.forEach((n) => {
+    memeCount.forEach((person) => {
       // Во сколько раз превышена квота:
       // (колич. астивных человек в конфе * колич. мемов данного человека / мемов всего)
-      quotaTimes = activeUsers*n.count/totalCount
+      quotaTimes = activeUsers*person.count/totalCount
       if (quotaTimes > 1) {
-        dropProb[n._id] = 1 - (1/quotaTimes)
+        dropProb[person._id] = 1 - (1/quotaTimes)
       } else {
-        dropProb[n._id] = 0
+        dropProb[person._id] = 0
       }
-      console.log(n._id + " ["+n.count+"]: " + dropProb[n._id])
+      console.log(person._id + " ["+person.count+"]: " + dropProb[person._id])
     })
   })
 })
@@ -143,6 +143,34 @@ app.get('/score', (req, res) => {
       "wrong": req.session.wrong
     }
     res.status(200).send(scoreObj)
+  } else {
+    res.status(403).send()
+  }
+})
+
+app.get('/stats', async (req, res) => {
+  if (req.session.loggedIn) {
+    answersCollection.aggregate([
+      {
+        '$group': {
+          '_id': '$selected', 
+          'correct': {
+            '$sum': {
+              '$cond': [
+                '$correct', 1, 0
+              ]
+            }
+          }, 
+          'wrong': {
+            '$sum': {
+              '$cond': [
+                '$correct', 0, 1
+              ]
+            }
+          }
+        }
+      }
+    ]).toArray().then(stats => res.status(200).send(stats))
   } else {
     res.status(403).send()
   }

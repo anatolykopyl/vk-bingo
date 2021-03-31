@@ -42,10 +42,10 @@ span {
   div {
     width: 100%;
     position: fixed;
-    height: 1em;
     padding: 0.4em 0px 0.4em 0px;
     bottom: 0px;
     border-radius: 0px;
+    z-index: 100;
   }
 }
 </style>

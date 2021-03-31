@@ -14,8 +14,9 @@
         </transition>
       </div>
     </div>
-    <Score :score="score" />
+    <Score v-if="card !== null" :score="score" />
     <square-loader v-if="card === null" :color="'#f3f3f3'" class="loader" />
+    <Stats />
   </div>
 </template>
 
@@ -24,6 +25,7 @@ import axios from 'axios'
 import List from './List.vue'
 import Result from './Result.vue'
 import Score from './Score.vue'
+import Stats from './Stats.vue'
 
 import SquareLoader from 'vue-spinner/src/SquareLoader.vue'
 
@@ -33,6 +35,7 @@ export default {
     List,
     Result,
     Score,
+    Stats,
     SquareLoader
   },
   props: {
