@@ -31,7 +31,7 @@ export default {
   background-color: #5a5a5a;
   border-radius: 6px;
   margin: 3px;
-  padding: 5px 9px 5px 9px;
+  padding: 5px 9px;
   transition: transform 0.2s;
 }
 .option:hover {

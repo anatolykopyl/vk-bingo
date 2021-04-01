@@ -17,10 +17,10 @@ export default {
 <style scoped>
 div {
   width: 350px;
-  border-radius: 0px 0px 17px 17px;
+  border-radius: 0 0 17px 17px;
   background-color: #f3f3f3;
   margin: auto;
-  padding: 0.4em 18px 0.4em 18px;
+  padding: 0.4em 18px;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: space-evenly;
@@ -42,9 +42,9 @@ span {
   div {
     width: 100%;
     position: fixed;
-    padding: 0.4em 0px 0.4em 0px;
-    bottom: 0px;
-    border-radius: 0px;
+    padding: 0.4em 0;
+    bottom: 0;
+    border-radius: 0;
     z-index: 100;
   }
 }

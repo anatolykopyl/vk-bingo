@@ -45,14 +45,14 @@ div {
   width: 400px;
   margin: auto;
   border-radius: 18px;
-  padding: 40px 10px 40px 10px;
+  padding: 40px 10px;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.6);
 }
 
 input {
   font-size: 1em;
   text-align: center;
-  padding: 5px 8px 5px 8px;
+  padding: 5px 8px;
   margin-bottom: 1em;
   border-radius: 6px;
   border: none;
@@ -67,14 +67,14 @@ button {
   border-radius: 6px;
   border: none;
   width: 20ch;
-  padding: 5px 8px 5px 8px;
+  padding: 5px 8px;
   cursor: pointer;
 }
 
 @media only screen and (max-width: 520px) {
   div {
     width: 100%;
-    padding: 40px 0px 40px 0px;
+    padding: 40px 0;
   }
 }
 </style>

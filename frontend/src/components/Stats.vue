@@ -72,8 +72,8 @@ div {
   div {
     width: 100%;
     position: relative;
-    padding: 1em 0px 1em 0px;
-    margin: 1em 0px 0px 0px;
+    padding: 1em 0;
+    margin: 1em 0 0 0;
     border-radius: 17px;
   }
 }
