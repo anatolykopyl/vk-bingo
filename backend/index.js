@@ -184,4 +184,12 @@ app.get('/options', async (req, res) => {
   }
 })
 
-app.listen(process.env.PORT)
+if (process.env.NODE_ENV === 'production') {
+  https.createServer({
+      key: fs.readFileSync(process.env.SSL+'/privkey.pem'),
+      cert: fs.readFileSync(process.env.SSL+'/cert.pem')
+  }, app)
+  .listen(process.env.PORT, () => console.log('Prod server started on ' + process.env.PORT));
+} else {
+  app.listen(process.env.PORT, () => console.log('Dev server started on ' + process.env.PORT));
+}
