@@ -1,0 +1,8 @@
+{
+  "name": "Vk Bingo",
+  "short_name": "Bingo",
+  "lang": "ru-RU",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone"
+}
