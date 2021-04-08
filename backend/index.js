@@ -1,3 +1,5 @@
+const https = require('https')
+const fs = require('fs')
 const express = require('express')
 const session = require('express-session')
 const app = express()
@@ -8,7 +10,8 @@ require('dotenv').config()
 
 app.use(cors({
   origin: [
-    process.env.FRONTEND
+    process.env.FRONTEND,
+    process.env.FRONTEND_HTTPS
   ],
   credentials: true,
   exposedHeaders: ['set-cookie']
