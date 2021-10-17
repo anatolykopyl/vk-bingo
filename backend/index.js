@@ -117,6 +117,25 @@ app.get('/card', async (req, res) => {
   }
 })
 
+app.get('/meme', async (req, res) => {
+  try {
+    let card
+    // Тянем карты и отбрасываем их в соответствии с их вероятностью отбрасывания
+    do {
+      card = await cardsCollection.aggregate([{ $sample: { size: 1 } }]).toArray()
+      card = card[0]
+    } while (Math.random() < dropProb[card.name])
+    // Удаляем конфиденциальную информацию
+    delete card.date
+    delete card.link
+    delete card.name
+    res.status(200).send(card)
+  } catch (e) {
+    console.log("Error: " + e)
+    res.status(500).send()
+  }
+})
+
 app.post('/answer', (req, res) => {
   if (req.session.loggedIn) {
     if (req.body.data.correct) {
