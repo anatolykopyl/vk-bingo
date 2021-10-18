@@ -118,7 +118,7 @@ app.get('/card', async (req, res) => {
 })
 
 app.get('/meme', async (req, res) => {
-  const amount = req.query.amount || 1
+  const amount = Number(req.query.amount) || 1
   try {
     let cards = await cardsCollection.aggregate([{ $sample: { size: amount } }]).toArray()
     // Удаляем конфиденциальную информацию
