@@ -118,18 +118,14 @@ app.get('/card', async (req, res) => {
 })
 
 app.get('/meme', async (req, res) => {
+  const amount = req.query.amount || 1
   try {
-    let card
-    // Тянем карты и отбрасываем их в соответствии с их вероятностью отбрасывания
-    do {
-      card = await cardsCollection.aggregate([{ $sample: { size: 1 } }]).toArray()
-      card = card[0]
-    } while (Math.random() < dropProb[card.name])
+    let cards = await cardsCollection.aggregate([{ $sample: { size: amount } }]).toArray()
     // Удаляем конфиденциальную информацию
-    delete card.date
-    delete card.link
-    delete card.name
-    res.status(200).send(card)
+    cards = cards.map((card) => {
+      return card.image
+    })
+    res.status(200).send(cards)
   } catch (e) {
     console.log("Error: " + e)
     res.status(500).send()
