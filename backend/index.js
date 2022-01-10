@@ -77,7 +77,7 @@ cardsCollection.aggregate([
   })
 })
 
-app.post('/auth', async (req, res) => {
+app.post('/api/auth', async (req, res) => {
   if (req.session.loggedIn) {
     res.status(200).send("Logged in")
   } else {
@@ -96,7 +96,7 @@ app.post('/auth', async (req, res) => {
   }
 })
 
-app.get('/card', async (req, res) => {
+app.get('/api/card', async (req, res) => {
   if (req.session.loggedIn) {
     try {
       let card
@@ -115,7 +115,7 @@ app.get('/card', async (req, res) => {
   }
 })
 
-app.get('/meme', async (req, res) => {
+app.get('/api/meme', async (req, res) => {
   const amount = Number(req.query.amount) || 1
   try {
     let cards = await cardsCollection.aggregate([{ $sample: { size: amount } }]).toArray()
@@ -130,7 +130,7 @@ app.get('/meme', async (req, res) => {
   }
 })
 
-app.post('/answer', (req, res) => {
+app.post('/api/answer', (req, res) => {
   if (req.session.loggedIn) {
     if (req.body.data.correct) {
       req.session.right++
@@ -150,7 +150,7 @@ app.post('/answer', (req, res) => {
   }
 })
 
-app.get('/score', (req, res) => {
+app.get('/api/score', (req, res) => {
   if (req.session.loggedIn) {
     req.session.right = req.session.right || 0
     req.session.wrong = req.session.wrong || 0
@@ -164,7 +164,7 @@ app.get('/score', (req, res) => {
   }
 })
 
-app.get('/stats', async (req, res) => {
+app.get('/api/stats', async (req, res) => {
   if (req.session.loggedIn) {
     answersCollection.aggregate([
       {
@@ -192,7 +192,7 @@ app.get('/stats', async (req, res) => {
   }
 })
 
-app.get('/options', async (req, res) => {
+app.get('/api/options', async (req, res) => {
   if (req.session.loggedIn) {
     res.status(200).send(names)
   } else {
