@@ -1,5 +1,3 @@
-const https = require('https')
-const fs = require('fs')
 const express = require('express')
 const session = require('express-session')
 const app = express()
@@ -202,12 +200,4 @@ app.get('/options', async (req, res) => {
   }
 })
 
-if (process.env.NODE_ENV === 'production') {
-  https.createServer({
-      key: fs.readFileSync(process.env.SSL+'/privkey.pem'),
-      cert: fs.readFileSync(process.env.SSL+'/cert.pem')
-  }, app)
-  .listen(process.env.PORT, () => console.log('Prod server started on ' + process.env.PORT));
-} else {
-  app.listen(process.env.PORT, () => console.log('Dev server started on ' + process.env.PORT));
-}
+app.listen(process.env.PORT, () => console.log('Server started on ' + process.env.PORT));
