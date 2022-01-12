@@ -51,21 +51,23 @@ cardsCollection.aggregate([
 ]).toArray().then((memeCount) => {
   cardsCollection.countDocuments().then((totalCount) => {
     let quota, quotaTimes
-    let activeUsers = 0
 
     quota = totalCount/memeCount.length  // Квота мемов на человека
     console.log(totalCount + " мемов всего. Квота: " + quota)
 
-    // Подсчет количества активных пользователей
-    memeCount.forEach((person) => {
-      if (person.count > quota/10)
-        activeUsers++
-    })
+    function activeUsers() {
+      let activeUsers = 0
+      memeCount.forEach((person) => {
+        if (person.count > quota/10)
+          activeUsers++
+      })
+      return activeUsers
+    }
 
     memeCount.forEach((person) => {
       // Во сколько раз превышена квота:
       // (колич. астивных человек в конфе * колич. мемов данного человека / мемов всего)
-      quotaTimes = activeUsers*person.count/totalCount
+      quotaTimes = activeUsers()*person.count/totalCount
       if (quotaTimes > 1) {
         dropProb[person._id] = 1 - (1/quotaTimes)
       } else {
@@ -96,25 +98,24 @@ app.post('/api/auth', async (req, res) => {
 })
 
 app.get('/api/card', async (req, res) => {
+  async function drawCard() {
+    let card
+    // Тянем карты и отбрасываем их в соответствии с их вероятностью отбрасывания
+    do {
+      card = await cardsCollection.aggregate([
+        {
+          $sample: { size: 1 }
+        }, {
+          $unset: [ 'name', 'link', 'date' ]
+        }
+      ]).toArray()
+      card = card[0]
+    } while (Math.random() < dropProb[card.name])
+    return card
+  }
+
   if (req.session.loggedIn) {
-    try {
-      let card
-      // Тянем карты и отбрасываем их в соответствии с их вероятностью отбрасывания
-      do {
-        card = await cardsCollection.aggregate([
-          {
-            $sample: { size: 1 }
-          }, {
-            $unset: [ 'name', 'link', 'date' ]
-          }
-        ]).toArray()
-        card = card[0]
-      } while (Math.random() < dropProb[card.name])
-      res.status(200).send(card)
-    } catch (e) {
-      console.log("Error: " + e)
-      res.status(500).send()
-    }
+    res.status(200).send(await drawCard())
   } else {
     res.status(403).send()
   }
