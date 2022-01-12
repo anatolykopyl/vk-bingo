@@ -45,7 +45,6 @@ export default {
     return {
       options: null,
       card: null,
-      oldCard: null,
       correctAnswer: null,    // True or False
       selectedAnswer: null,   // Чье-то имя
       showResult: false
@@ -79,7 +78,6 @@ export default {
             innerThis.score.wrong++
           }
       }, 805)
-      this.oldCard = this.card
       axios
         .post(process.env.VUE_APP_BACKEND + '/answer', {
           'data': {
@@ -89,8 +87,7 @@ export default {
         })
         .then((response) => {
           this.correctAnswer = response.data.correct
-          this.card.name = response.data.name
-          this.card.date = response.data.date
+          this.card = response.data.card
         })
     }
   },

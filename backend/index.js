@@ -140,29 +140,20 @@ app.post('/api/answer', async (req, res) => {
     if (req.body.data.id && req.body.data.name) {
       const card = await cardsCollection.findOne({ _id: ObjectId(req.body.data.id) })
       if (card) {
-        if (card.name === req.body.data.name) {
-          req.session.right++
-          answersCollection.insertOne({ 
-            correct: true,
-            selected: req.body.data.name
-          })
-          res.status(200).send({
-            correct: true,
-            name: card.name,
-            date: card.date
-          })
+        const correct = card.name === req.body.data.name
+        if (correct) {
+          req.session.right++ 
         } else {
           req.session.wrong++
-          answersCollection.insertOne({
-            correct: false,
-            selected: req.body.data.name
-          })
-          res.status(200).send({
-            correct: false,
-            name: card.name,
-            date: card.date
-          })
         }
+        answersCollection.insertOne({ 
+          correct,
+          selected: req.body.data.name
+        })
+        res.status(200).send({
+          correct,
+          card
+        })
       } else {
         res.status(500).send() 
       }
