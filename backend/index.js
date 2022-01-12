@@ -1,7 +1,7 @@
 const express = require('express')
 const session = require('express-session')
 const app = express()
-const {MongoClient} = require('mongodb')
+const { MongoClient, ObjectId } = require('mongodb')
 const MongoStore = require('connect-mongo')
 const cors = require('cors')
 require('dotenv').config()
@@ -9,7 +9,6 @@ require('dotenv').config()
 app.use(cors({
   origin: [
     process.env.FRONTEND,
-    process.env.FRONTEND_HTTPS
   ],
   credentials: true,
   exposedHeaders: ['set-cookie']
@@ -102,7 +101,13 @@ app.get('/api/card', async (req, res) => {
       let card
       // Тянем карты и отбрасываем их в соответствии с их вероятностью отбрасывания
       do {
-        card = await cardsCollection.aggregate([{ $sample: { size: 1 } }]).toArray()
+        card = await cardsCollection.aggregate([
+          {
+            $sample: { size: 1 }
+          }, {
+            $unset: [ 'name', 'link', 'date' ]
+          }
+        ]).toArray()
         card = card[0]
       } while (Math.random() < dropProb[card.name])
       res.status(200).send(card)
@@ -130,20 +135,39 @@ app.get('/api/meme', async (req, res) => {
   }
 })
 
-app.post('/api/answer', (req, res) => {
+app.post('/api/answer', async (req, res) => {
   if (req.session.loggedIn) {
-    if (req.body.data.correct) {
-      req.session.right++
+    if (req.body.data.id && req.body.data.name) {
+      const card = await cardsCollection.findOne({ _id: ObjectId(req.body.data.id) })
+      if (card) {
+        if (card.name === req.body.data.name) {
+          req.session.right++
+          answersCollection.insertOne({ 
+            correct: true,
+            selected: req.body.data.name
+          })
+          res.status(200).send({
+            correct: true,
+            name: card.name,
+            date: card.date
+          })
+        } else {
+          req.session.wrong++
+          answersCollection.insertOne({
+            correct: false,
+            selected: req.body.data.name
+          })
+          res.status(200).send({
+            correct: false,
+            name: card.name,
+            date: card.date
+          })
+        }
+      } else {
+        res.status(500).send() 
+      }
     } else {
-      req.session.wrong++
-    }
-
-    try {
-      answersCollection.insertOne(req.body.data)
-      res.status(200).send()
-    } catch (e) {
-      console.log("Error: " + e)
-      res.status(500).send()
+      res.status(400).send()  
     }
   } else {
     res.status(403).send()

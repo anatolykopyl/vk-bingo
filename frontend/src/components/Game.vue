@@ -69,7 +69,6 @@ export default {
       }
     },
     selectAnswer: function(selection) {
-      this.correctAnswer = selection === this.card.name
       this.selectedAnswer = selection
       let innerThis = this
       setTimeout(function() {
@@ -84,9 +83,14 @@ export default {
       axios
         .post(process.env.VUE_APP_BACKEND + '/answer', {
           'data': {
-            'correct': this.correctAnswer,
-            'selected': this.selectedAnswer
+            'id': this.card._id,
+            'name': this.selectedAnswer
           }
+        })
+        .then((response) => {
+          this.correctAnswer = response.data.correct
+          this.card.name = response.data.name
+          this.card.date = response.data.date
         })
     }
   },
