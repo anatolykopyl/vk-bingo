@@ -219,5 +219,10 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
     }
   });
 
-  app.listen(process.env.PORT, () => console.log(`Server started on ${process.env.PORT}`));
+  app.listen(
+    3000,
+    '0.0.0.0',
+    511,
+    () => console.log(`Server started on port ${3000}`),
+  );
 })();
