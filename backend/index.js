@@ -3,6 +3,7 @@ import session from 'express-session';
 import mongodb from 'mongodb';
 import MongoStore from 'connect-mongo';
 import cors from 'cors';
+import crypto from 'crypto'
 import { createNanoEvents } from 'nanoevents';
 
 import "dotenv/config";
@@ -103,7 +104,6 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
   }
 
   let players = {}
-  let oldPlayers = {}
   let score = {}
   let card = await drawCard()
   let oldCard = null;
@@ -257,6 +257,8 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
   });
 
   app.get('/api/stream', async (req, res) => {
+    const id = crypto.randomUUID()
+
     res.set({
       'Access-Control-Allow-Origin': '*',
       'Cache-Control': 'no-cache',
@@ -278,6 +280,7 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
         players,
         selected
       }
+
       res.write(`data: ${JSON.stringify(data)}\nevent: answer\n\n`);
 
       answers += 1
@@ -295,12 +298,13 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
         answers = 0
         oldCard = { ...card }
         card = await drawCard()
-        emitter.emit('allDone');
+        
+        emitter.emit(`allDone-${id}`);
       }
     });
 
-    emitter.on('allDone', () => {
-      const data = { 
+    const unbindAllDone = emitter.on(`allDone-${id}`, () => {
+      const data = {
         correctAnswer: oldCard.name,
         score
       }

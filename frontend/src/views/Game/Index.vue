@@ -1,5 +1,5 @@
 <template>
-  <h1>Флекспатруль мультиплеер</h1>
+  <h1 class="header">Флекспатруль мультиплеер</h1>
 
   <div class="main">
     <div 
@@ -12,16 +12,14 @@
       >
       <h2>Кто скинул этот мем?</h2>
       <div class="interactive">
-        <transition name="fade-answers">
+        <transition name="fade-answers" mode="out-in">
           <List
             v-if="!showResult"
             :options="options" 
             @selectedAnswer="selectAnswer" 
           />
-        </transition>
-        <transition name="spin-result">
           <Result 
-            v-if="showResult" 
+            v-else 
             :selectedName="selectedAnswer" 
             :correct="correctAnswer"
           />
@@ -97,19 +95,32 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
+.header {
+  padding: 60px;
+  margin: auto;
+  height: 42px;
+}
+
 .main {
-  padding-bottom: 200px;
+  position: relative;
+  min-height: calc(100vh - 162px);
+  box-sizing: border-box;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .card {
   width: 450px;
-  margin: auto;
+  margin: 0 auto;
+  min-height: 0;
 }
 
 .meme {
   width: 100%;
   border-radius: 32px;
-  border: 3px solid black;
+  border: 3px solid var(--clr-text);
   @include filled-shadow(16);
   transform: translateX(-8px);
 }
@@ -120,11 +131,6 @@ onMounted(async () => {
 
 .interactive {
   position: relative;
-
-  > * {
-    position: absolute;
-    width: 100%;
-  }
 }
 
 .fade-answers-leave-active {
@@ -133,14 +139,6 @@ onMounted(async () => {
 .fade-answers-leave-to {
   opacity: 0;
   transform: scale(0.3);
-}
-
-.spin-result-enter-active {
-  transition: all 2s ease;
-}
-.spin-result-enter-from {
-  transform: scale(0.2);
-  transform: rotateY(120deg);
 }
 
 .loader {

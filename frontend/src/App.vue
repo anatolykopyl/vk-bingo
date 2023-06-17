@@ -28,6 +28,7 @@
 :root {
   --clr-bg: #ffd537;
   --clr-accent: #37ffac;
+  --clr-text: #141414;
 }
 
 body {
@@ -35,16 +36,17 @@ body {
   background-color: var(--clr-bg);
 }
 
+input, button {
+  font: inherit;
+}
+
 #app {
   font-family: "Pangram Sans Rounded", Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: black;
-  margin-top: 60px;
-}
-
-#game {
-  margin-bottom: 100px;
+  color: var(--clr-text);
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 </style>

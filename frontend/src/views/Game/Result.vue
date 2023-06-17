@@ -31,12 +31,12 @@ export default {
 <style scoped>
 .result {
   padding: 30px 40px;
-  border-radius: 8px;
+  border-radius: 32px;
   background-color: white;
 }
 
 .correct {
-  color: black;
+  color: var(--clr-text);
   background-color: var(--clr-accent);
 }
 

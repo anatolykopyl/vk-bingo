@@ -2,7 +2,7 @@
   $resulting-shadow: null;
 
   @for $i from 1 through $distance {
-    $resulting-shadow: $resulting-shadow, #{$i}px #{$i}px 0 black;
+    $resulting-shadow: $resulting-shadow, #{$i}px #{$i}px 0 var(--clr-text);
   }
 
   box-shadow: $resulting-shadow;

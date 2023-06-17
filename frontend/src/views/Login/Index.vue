@@ -1,6 +1,4 @@
 <template>
-  <h1>Флекспатруль мультиплеер</h1>
-
   <div class="authCard">
     <h1>Авторизация:</h1>
 
@@ -9,21 +7,25 @@
       <input 
         placeholder="Ответ"
         v-model="answer"
+        class="input"
       >
       <input
         v-if="mode === 'player'"
         placeholder="Ваше имя"
         v-model="username"
+        class="input"
       >
       
       <button 
         v-if="mode === 'player'"
+        class="login"
         @click="loginPlayer" 
       >
         Войти как игрок
       </button>
       <button 
         v-else
+        class="login"
         @click="loginScreen" 
       >
         Войти как большой экран
@@ -31,7 +33,7 @@
       
       <button 
         @click="switchMode"
-        class="secondary"
+        class="switchMode"
       >
         Я не {{ mode === 'player' ? 'игрок' : 'большой экран' }}!
       </button>
@@ -60,6 +62,10 @@ function switchMode() {
 }
 
 async function loginPlayer() {
+  if (!answer.value || !username.value) {
+    return
+  }
+
   store.username = username.value
 
   await axios
@@ -83,7 +89,7 @@ async function loginScreen() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .auth {
   display: flex;
   gap: 16px;
@@ -92,43 +98,68 @@ async function loginScreen() {
 }
 
 .authCard {
-  background-color: #121212;
-  color: white;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--clr-text);
+  color: var(--clr-text);
   width: 400px;
   margin: auto;
-  border-radius: 18px;
-  padding: 40px 10px;
-  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.6);
+  border-radius: 32px;
+  padding: 40px 40px;
+  box-sizing: border-box;
+  background: white;
+  border: 3px solid var(--clr-text);
+  @include filled-shadow(16);
 }
 
-input {
-  font-size: 1em;
-  text-align: center;
-  padding: 5px 8px;
-  border-radius: 6px;
-  border: none;
-  width: 20ch;
+.input {
+  font-size: 16px;
+  padding: 16px;
+  border: 2px solid var(--clr-text);
+  width: 100%;
+  box-sizing: border-box;
+  @include filled-shadow(4);
+  border-radius: 12px;
+
+  &:focus {
+    outline: none;
+  }
 }
 
-button {
-  color: white;
-  font-size: 1em;
-  box-sizing: content-box;
-  background-color: #5a5a5a;
-  border-radius: 6px;
+.login {
+  color: var(--clr-text);
+  font-size: 16px;
+  box-sizing: border-box;
+  background-color: var(--clr-bg);
   border: none;
-  width: 20ch;
-  padding: 5px 8px;
+  width: 100%;
+  padding: 16px;
   cursor: pointer;
+  border: 2px solid var(--clr-text);
+  @include filled-shadow(4);
+  border-radius: 12px;
 }
 
-button.secondary {
-  background: #919191;
+.switchMode {
+  position: absolute;
+  color: var(--clr-text);
+  background: var(--clr-accent);
   font-size: 12px;
+  width: 70px;
+  height: 70px;
+  border-radius: 100px;
+  border: 2px solid var(--clr-text);
+  left: 0;
+  bottom: 0;
+  transform: translate(-50%, 50%);
+  cursor: pointer;
+  @include filled-shadow(4);
 }
 
 @media only screen and (max-width: 520px) {
-  div {
+  .authCard {
     width: 100%;
     padding: 40px 0;
   }

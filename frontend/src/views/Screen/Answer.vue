@@ -25,7 +25,7 @@ const position = reactive({
   border-radius: 32px;
   font-size: 30px;
   padding: 32px;
-  border: 3px solid black;
+  border: 3px solid var(--clr-text);
   top: 50%;
   left: 50%;
   font-weight: 600;

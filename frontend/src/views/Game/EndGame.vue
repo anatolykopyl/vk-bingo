@@ -22,10 +22,10 @@ function endGame() {
 
 <style scoped lang="scss">
 .end {
-  position: fixed;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
+  // position: fixed;
+  // bottom: 8px;
+  // left: 50%;
+  // transform: translateX(-50%);
 }
 
 .endButton {
@@ -33,7 +33,7 @@ function endGame() {
   border: none;
   font: inherit;
   padding: 8px 12px;
-  border-bottom: 1px dotted black;
+  border-bottom: 1px dotted var(--clr-text);
 
   &:hover {
     cursor: pointer;

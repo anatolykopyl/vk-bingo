@@ -148,7 +148,7 @@ onMounted(() => {
   padding: 64px;
   background: var(--clr-bg);
   box-sizing: border-box;
-  color: black;
+  color: var(--clr-text);
 }
 
 .image {
@@ -158,7 +158,8 @@ onMounted(() => {
   object-fit: contain;
   margin-top: auto;
   margin-bottom: auto;
-  border: 3px solid black;
+  background: var(--clr-text);
+  border: 3px solid var(--clr-text);
   @include filled-shadow(16);
   border-radius: 64px;
   animation-name: rock;
@@ -187,7 +188,7 @@ onMounted(() => {
 }
 
 .users.-unanwsered {
-  border-right: 1px dashed black;
+  border-right: 1px dashed var(--clr-text);
 }
 
 .user.-correct {
