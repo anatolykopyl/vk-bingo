@@ -11,7 +11,10 @@
   "dependencies": {
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
-    "vue": "^3.0.0",
+    "pinia": "^2.1.4",
+    "vue": "^3.3.4",
+    "vue-peel": "^0.1.1",
+    "vue-router": "4",
     "vue-spinner": "^1.0.4"
   },
   "devDependencies": {
@@ -30,7 +33,7 @@
       "node": true
     },
     "extends": [
-      "plugin:vue/vue3-essential",
+      "plugin:vue/vue3-recommended",
       "eslint:recommended"
     ],
     "parserOptions": {

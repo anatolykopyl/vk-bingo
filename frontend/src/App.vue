@@ -1,42 +1,19 @@
 <template>
-  <h1>🎱 Флекспатрульное Бинго 🎱</h1>
-  <Login id="login" @loggedIn="login" v-show="!loggedIn" />
-  <Game id="game" v-if="loggedIn" :score="score" />
-  <a class="source" href="https://github.com/anatolykopyl/vk-bingo">Исходный код</a>
+  <h1>Флекспатруль мультиплеер</h1>
+  
+  <router-view />
+
+  <a
+    class="source" 
+    href="https://github.com/anatolykopyl/vk-bingo"
+    target="_blank"
+  >
+    Исходный код
+  </a>
 </template>
 
-<script>
-import axios from 'axios'
-import Login from './components/Login.vue'
-import Game from './components/Game.vue'
+<script setup>
 
-export default {
-  name: 'App',
-  components: {
-    Login,
-    Game
-  },
-  data() {
-    return {
-      loggedIn: null,
-      score: {
-        "right": 0, 
-        "wrong": 0
-      }
-    }
-  },
-  methods: {
-    login: function(success) {
-      this.loggedIn = success
-      axios
-        .get(process.env.VUE_APP_BACKEND + '/score')
-        .then(response => {
-          if (Object.keys(response.data).length !== 0)
-            this.score = response.data
-        })
-    }
-  }
-}
 </script>
 
 <style>

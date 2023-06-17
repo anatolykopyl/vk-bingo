@@ -1,23 +1,26 @@
-const express = require('express');
-const session = require('express-session');
+import express from 'express';
+import session from 'express-session';
+import mongodb from 'mongodb';
+import MongoStore from 'connect-mongo';
+import cors from 'cors';
+import { createNanoEvents } from 'nanoevents';
+
+import "dotenv/config";
+
+import names from './names.json' assert { type: "json" };
 
 const app = express();
-const { MongoClient, ObjectId } = require('mongodb');
-const MongoStore = require('connect-mongo');
-const cors = require('cors');
-require('dotenv').config();
+
+const emitter = createNanoEvents();
+const { MongoClient, ObjectId } = mongodb;
 
 app.use(cors({
-  origin: [
-    process.env.FRONTEND,
-  ],
+  origin: process.env.FRONTEND,
   credentials: true,
   exposedHeaders: ['set-cookie'],
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-const names = require('./names.json');
 
 const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
 
@@ -139,34 +142,40 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
     }
   });
 
+  const state = {}
   app.post('/api/answer', async (req, res) => {
-    if (req.session.loggedIn) {
-      if (req.body.data.id && req.body.data.name) {
-        const card = await cardsCollection.findOne({ _id: ObjectId(req.body.data.id) });
-        if (card) {
-          const correct = card.name === req.body.data.name;
-          if (correct) {
-            req.session.right += 1;
-          } else {
-            req.session.wrong += 1;
-          }
-          answersCollection.insertOne({
-            correct,
-            selected: req.body.data.name,
-          });
-          res.status(200).send({
-            correct,
-            card,
-          });
-        } else {
-          res.status(500).send();
-        }
-      } else {
-        res.status(400).send();
-      }
-    } else {
-      res.status(403).send();
+    if (!req.session.loggedIn) {
+      return res.status(403).send();
     }
+
+    if (!req.body.data.id || !req.body.data.name || !req.body.data.username) {
+      return res.status(400).send();
+    }
+
+    const card = await cardsCollection.findOne({ _id: ObjectId(req.body.data.id) });
+    if (!card) {
+      return res.status(500).send();
+    }
+
+    const correct = card.name === req.body.data.name;
+    if (correct) {
+      req.session.right += 1;
+    } else {
+      req.session.wrong += 1;
+    }
+    answersCollection.insertOne({
+      correct,
+      selected: req.body.data.name,
+    });
+
+    state[req.body.data.username] = true
+    emitter.emit('answer', req.body.data.username);
+
+    // return res.status(200).send({
+    //   correct,
+    //   card,
+    // });
+    return res.status(200).send()
   });
 
   app.get('/api/score', (req, res) => {
@@ -216,6 +225,74 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
       res.status(200).send(names);
     } else {
       res.status(403).send();
+    }
+  });
+
+  let usernames = new Set();
+  app.post('/api/connect', async (req, res) => {
+    if (!req.session.loggedIn) {
+      return res.status(403).send();
+    }
+
+    const { username } = req.body;
+    usernames.add(username);
+    state[username] = false;
+    emitter.emit('connection', usernames)
+
+    return res.status(200).send();
+  });
+
+  app.post('/api/end', async (req, res) => {
+    if (!req.session.loggedIn) {
+      return res.status(403).send();
+    }
+
+    usernames = new Set();
+    state = {}
+    return res.status(200).send();
+  });
+
+  app.get('/api/stream', async (req, res) => {
+    res.set({
+      'Access-Control-Allow-Origin': '*',
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive',
+      'Content-Type': 'text/event-stream',
+    });
+    res.flushHeaders();
+
+    emitter.on('connection', (usernames) => {
+      const data = usernames
+      res.write(`data: ${JSON.stringify(data)}\nevent: userlist\n\n`);
+    })
+
+    emitter.on('answer', (username) => {
+      const data = { 
+        username,
+        state
+      }
+      res.write(`data: ${JSON.stringify(data)}\nevent: answer\n\n`);
+    });
+
+    emitter.on('allDone', () => {
+      const data = {}
+      res.write(`data: ${JSON.stringify(data)}\nevent: reveal\n\n`);
+    });
+
+    res.on('close', () => {
+      res.end();
+    });
+  });
+
+  let answers = 0;
+  emitter.on('answer', () => {
+    answers += 1;
+
+    if (answers === usernames.length) {
+      Object.keys(state).forEach((key) => {
+        state[key] = false
+      })
+      emitter.emit('allDone');
     }
   });
 
