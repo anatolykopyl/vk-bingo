@@ -4,33 +4,31 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "dev": "vite dev",
+    "build": "vite build"
   },
   "dependencies": {
     "axios": "^0.21.1",
-    "core-js": "^3.6.5",
     "pinia": "^2.1.4",
+    "pinia-plugin-persistedstate": "^3.1.0",
     "vue": "^3.3.4",
     "vue-peel": "^0.1.1",
     "vue-router": "4",
     "vue-spinner": "^1.0.4"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
-    "@vue/compiler-sfc": "^3.0.0",
-    "babel-eslint": "^10.1.0",
+    "@vitejs/plugin-vue": "^4.2.3",
     "dotenv-webpack": "^7.0.2",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^7.0.0"
+    "eslint": "8",
+    "eslint-plugin-vue": "8",
+    "sass": "^1.63.4",
+    "vite": "^4.3.9"
   },
   "eslintConfig": {
     "root": true,
     "env": {
-      "node": true
+      "node": true,
+      "es2022": true
     },
     "extends": [
       "plugin:vue/vue3-recommended",

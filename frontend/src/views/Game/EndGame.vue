@@ -1,6 +1,9 @@
 <template>
-  <div>
-    <button @click="endGame">
+  <div class="end">
+    <button 
+      @click="endGame"
+      class="endButton"
+    >
       Закончить игру
     </button>
   </div>
@@ -12,7 +15,28 @@ import { useRouter } from 'vue-router';
 const router = useRouter()
 
 function endGame() {
-  axios.post(process.env.VUE_APP_BACKEND + '/end')
-  router.push('/login')
+  axios.post(import.meta.env.VITE_APP_BACKEND + '/end')
+  router.push('/')
 }
 </script>
+
+<style scoped lang="scss">
+.end {
+  position: fixed;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.endButton {
+  background: none;
+  border: none;
+  font: inherit;
+  padding: 8px 12px;
+  border-bottom: 1px dotted black;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+</style>

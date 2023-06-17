@@ -1,5 +1,7 @@
 <template>
-  <div>
+  <h1>Флекспатруль мультиплеер</h1>
+
+  <div class="main">
     <div 
       class="card" 
       v-if="card"
@@ -11,8 +13,8 @@
       <h2>Кто скинул этот мем?</h2>
       <div class="interactive">
         <transition name="fade-answers">
-          <List 
-            v-if="!selectedAnswer" 
+          <List
+            v-if="!showResult"
             :options="options" 
             @selectedAnswer="selectAnswer" 
           />
@@ -20,98 +22,96 @@
         <transition name="spin-result">
           <Result 
             v-if="showResult" 
-            :name="card.name" 
             :selectedName="selectedAnswer" 
-            :date="card.date" 
-            :correct="correctAnswer" 
+            :correct="correctAnswer"
           />
         </transition>
       </div>
     </div>
-    <Score 
-      v-if="card" 
-      :score="score" 
-    />
 
     <EndGame />
 
     <square-loader 
       v-if="!card" 
-      :color="'#f3f3f3'" 
+      :color="'white'" 
       class="loader" 
     />
-    <Stats />
   </div>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import List from './List.vue'
 import Result from './Result.vue'
-import Score from './Score.vue'
-import Stats from './Stats.vue'
 import EndGame from './EndGame.vue'
+import useStore from '@/store'
+import useServerEvents from '@/composables/useServerEvents'
 
 import SquareLoader from 'vue-spinner/src/SquareLoader.vue'
+
+const store = useStore()
+const { addRevealListener } = useServerEvents()
 
 const options = ref()
 const card = ref()
 const correctAnswer = ref()
 const selectedAnswer = ref()
 const showResult = ref()
-const score = reactive({
-  "right": 0, 
-  "wrong": 0
+
+addRevealListener((data) => {
+  showResult.value = true
+  correctAnswer.value = data.correctAnswer
+
+  setTimeout(() => {
+    getCard()
+  }, 5000)
 })
 
 async function getCard() {
   correctAnswer.value = null
   selectedAnswer.value = null
   showResult.value = false
-  const response = await axios.get(process.env.VUE_APP_BACKEND + '/card')
+  card.value = null
+  const response = await axios.get(import.meta.env.VITE_APP_BACKEND + '/card')
   card.value = response.data
 }
 
 async function selectAnswer(selection) {
   selectedAnswer.value = selection
-  // setTimeout(function() {
-  //   showResult.value = true
-  //   if (correctAnswer.value) {
-  //     score.right++ 
-  //   } else {
-  //     score.wrong++
-  //   }
-  // }, 805)
 
-  await axios.post(process.env.VUE_APP_BACKEND + '/answer', {
+  await axios.post(import.meta.env.VITE_APP_BACKEND + '/answer', {
     'data': {
       'id': card.value._id,
-      'name': selectedAnswer.value
+      'name': selectedAnswer.value,
+      'username': store.username
     }
   })
 }
 
 onMounted(async () => {
   getCard()
-  const response = await axios.get(process.env.VUE_APP_BACKEND + '/options')
+  const response = await axios.get(import.meta.env.VITE_APP_BACKEND + '/options')
   options.value = response.data
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.main {
+  padding-bottom: 200px;
+}
+
 .card {
   width: 450px;
-  padding: 18px;
-  border-radius: 17px;
-  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.6);
-  background-color: #121212;
   margin: auto;
 }
 
 .meme {
   width: 100%;
-  border-radius: 8px;
+  border-radius: 32px;
+  border: 3px solid black;
+  @include filled-shadow(16);
+  transform: translateX(-8px);
 }
 
 .clickable {
@@ -120,8 +120,11 @@ onMounted(async () => {
 
 .interactive {
   position: relative;
-  -webkit-perspective: 900000px;
-  perspective: 900000px;
+
+  > * {
+    position: absolute;
+    width: 100%;
+  }
 }
 
 .fade-answers-leave-active {

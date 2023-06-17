@@ -84,49 +84,56 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
     });
   });
 
+  async function drawCard() {
+    let card;
+    // Тянем карты и отбрасываем их в соответствии с их вероятностью отбрасывания
+    do {
+      /* eslint-disable no-await-in-loop */
+      card = await cardsCollection.aggregate([
+        {
+          $sample: { size: 1 },
+        }, {
+          $unset: ['link', 'date'],
+        },
+      ]).toArray();
+      /* eslint-enable no-await-in-loop */
+      [card] = card;
+    } while (Math.random() < dropProb[card.name]);
+    return card;
+  }
+
+  let players = {}
+  let oldPlayers = {}
+  let score = {}
+  let card = await drawCard()
+  let oldCard = null;
+  let answers = 0
+
   app.post('/api/auth', async (req, res) => {
-    if (req.session.loggedIn) {
-      res.status(200).send('Logged in');
+    const { pass, username } = req.body;
+
+    if (username && !Object.keys(players).includes(username)) {
+      players[username] = null;
+      emitter.emit('connection', Object.keys(players))
+    }
+
+    if (pass && pass.toLowerCase() === process.env.PASSWORD) {
+      req.session.loggedIn = true;
+      return res.status(200).send('Logged in');
     } else {
-      try {
-        const { pass } = req.body;
-        if (pass && pass.toLowerCase() === process.env.PASSWORD) {
-          req.session.loggedIn = true;
-          res.status(200).send('Logged in');
-        } else {
-          res.status(401).send('Wrong password');
-        }
-      } catch (e) {
-        console.log(`Error: ${e}`);
-        res.status(500).send();
-      }
+      return res.status(401).send('Wrong password');
     }
   });
 
   app.get('/api/card', async (req, res) => {
-    async function drawCard() {
-      let card;
-      // Тянем карты и отбрасываем их в соответствии с их вероятностью отбрасывания
-      do {
-        /* eslint-disable no-await-in-loop */
-        card = await cardsCollection.aggregate([
-          {
-            $sample: { size: 1 },
-          }, {
-            $unset: ['name', 'link', 'date'],
-          },
-        ]).toArray();
-        /* eslint-enable no-await-in-loop */
-        [card] = card;
-      } while (Math.random() < dropProb[card.name]);
-      return card;
+    if (!req.session.loggedIn) {
+      return res.status(403).send();
     }
 
-    if (req.session.loggedIn) {
-      res.status(200).send(await drawCard());
-    } else {
-      res.status(403).send();
-    }
+    return res.status(200).send({
+      ...card,
+      name: undefined
+    });
   });
 
   app.get('/api/meme', async (req, res) => {
@@ -142,7 +149,6 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
     }
   });
 
-  const state = {}
   app.post('/api/answer', async (req, res) => {
     if (!req.session.loggedIn) {
       return res.status(403).send();
@@ -168,8 +174,11 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
       selected: req.body.data.name,
     });
 
-    state[req.body.data.username] = true
-    emitter.emit('answer', req.body.data.username);
+    players[req.body.data.username] = req.body.data.name;
+    emitter.emit('answer', {
+      username: req.body.data.username,
+      selected: req.body.data.name
+    });
 
     // return res.status(200).send({
     //   correct,
@@ -193,31 +202,33 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
   });
 
   app.get('/api/stats', async (req, res) => {
-    if (req.session.loggedIn) {
-      answersCollection.aggregate([
-        {
-          $group: {
-            _id: '$selected',
-            correct: {
-              $sum: {
-                $cond: [
-                  '$correct', 1, 0,
-                ],
-              },
+    if (!req.session.loggedIn) {
+      return res.status(403).send();
+    }
+
+    const stats = await answersCollection.aggregate([
+      {
+        $group: {
+          _id: '$selected',
+          correct: {
+            $sum: {
+              $cond: [
+                '$correct', 1, 0,
+              ],
             },
-            wrong: {
-              $sum: {
-                $cond: [
-                  '$correct', 0, 1,
-                ],
-              },
+          },
+          wrong: {
+            $sum: {
+              $cond: [
+                '$correct', 0, 1,
+              ],
             },
           },
         },
-      ]).toArray().then((stats) => res.status(200).send(stats));
-    } else {
-      res.status(403).send();
-    }
+      },
+    ]).toArray();
+
+    return res.status(200).send(stats);
   });
 
   app.get('/api/options', async (req, res) => {
@@ -228,27 +239,20 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
     }
   });
 
-  let usernames = new Set();
-  app.post('/api/connect', async (req, res) => {
+  app.get('/api/players', async (req, res) => {
     if (!req.session.loggedIn) {
       return res.status(403).send();
     }
 
-    const { username } = req.body;
-    usernames.add(username);
-    state[username] = false;
-    emitter.emit('connection', usernames)
-
-    return res.status(200).send();
-  });
+    return res.status(200).send(Object.keys(players));
+  })
 
   app.post('/api/end', async (req, res) => {
     if (!req.session.loggedIn) {
       return res.status(403).send();
     }
 
-    usernames = new Set();
-    state = {}
+    players = {}
     return res.status(200).send();
   });
 
@@ -261,39 +265,51 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
     });
     res.flushHeaders();
 
-    emitter.on('connection', (usernames) => {
-      const data = usernames
+    emitter.on('connection', (players) => {
+      const data = players
       res.write(`data: ${JSON.stringify(data)}\nevent: userlist\n\n`);
     })
 
-    emitter.on('answer', (username) => {
+    emitter.on('answer', async ({
+      username, selected
+    }) => {
       const data = { 
         username,
-        state
+        players,
+        selected
       }
       res.write(`data: ${JSON.stringify(data)}\nevent: answer\n\n`);
+
+      answers += 1
+
+      if (answers === Object.keys(players).length) {
+        Object.keys(players).forEach((key) => {
+          if (card.name === players[key]) {
+            score[key] = (score[key] ?? 0) + 1
+          }
+        })
+
+        Object.keys(players).forEach((key) => {
+          players[key] = null
+        })
+        answers = 0
+        oldCard = { ...card }
+        card = await drawCard()
+        emitter.emit('allDone');
+      }
     });
 
     emitter.on('allDone', () => {
-      const data = {}
+      const data = { 
+        correctAnswer: oldCard.name,
+        score
+      }
       res.write(`data: ${JSON.stringify(data)}\nevent: reveal\n\n`);
     });
 
     res.on('close', () => {
       res.end();
     });
-  });
-
-  let answers = 0;
-  emitter.on('answer', () => {
-    answers += 1;
-
-    if (answers === usernames.length) {
-      Object.keys(state).forEach((key) => {
-        state[key] = false
-      })
-      emitter.emit('allDone');
-    }
   });
 
   app.listen(process.env.PORT, () => console.log(`Server started on ${process.env.PORT}`));

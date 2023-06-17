@@ -45,7 +45,7 @@ export default {
   },
   mounted() {
     axios
-        .get(process.env.VUE_APP_BACKEND + '/stats')
+        .get(import.meta.env.VITE_APP_BACKEND + '/stats')
         .then(response => {
           response.data.forEach(element => {
             this.stats[element._id] = element.correct / element.wrong

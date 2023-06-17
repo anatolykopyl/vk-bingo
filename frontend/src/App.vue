@@ -1,15 +1,5 @@
 <template>
-  <h1>Флекспатруль мультиплеер</h1>
-  
   <router-view />
-
-  <a
-    class="source" 
-    href="https://github.com/anatolykopyl/vk-bingo"
-    target="_blank"
-  >
-    Исходный код
-  </a>
 </template>
 
 <script setup>
@@ -17,49 +7,44 @@
 </script>
 
 <style>
+@font-face {
+  font-family: "Pangram Sans Rounded";
+  font-weight: bold;
+  src: local("Pangram Sans Rounded"), url("/fonts/PPPangramSansRounded-Bold.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Pangram Sans Rounded";
+  font-weight: 600;
+  src: local("Pangram Sans Rounded"), url("/fonts/PPPangramSansRounded-Semibold.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Pangram Sans Rounded";
+  font-weight: normal;
+  src: local("Pangram Sans Rounded"), url("/fonts/PPPangramSansRounded-Medium.otf") format("opentype");
+}
+
+:root {
+  --clr-bg: #ffd537;
+  --clr-accent: #37ffac;
+}
+
 body {
   margin: 0;
-  background-color: #5a5a5a;
+  background-color: var(--clr-bg);
 }
 
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Pangram Sans Rounded", Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #f3f3f3;
+  color: black;
   margin-top: 60px;
 }
 
 #game {
   margin-bottom: 100px;
-}
-
-.source {
-  color: #f3f3f350;
-  background-color: #12121250;
-  border-radius: 6px;
-  padding: 3px 6px;
-  position: fixed;
-  width: 20ch;
-  left: 0;
-  right: 0;
-  bottom: 10px;
-  text-align: center;
-  margin: 0 auto;
-  transition: all 0.3s;
-  cursor: pointer;
-  z-index: -1;
-}
-.source:hover {
-  color: #f3f3f3;
-  background-color: #121212;
-  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.6);
-}
-
-@media only screen and (max-width: 520px) {
-  .source {
-    display: none;
-  }
 }
 </style>

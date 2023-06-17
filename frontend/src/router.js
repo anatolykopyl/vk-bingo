@@ -4,8 +4,8 @@ import Login from './views/Login/Index.vue'
 import Screen from './views/Screen/Index.vue'
 
 const routes = [
-  { path: '/', component: Game },
-  { path: '/login', component: Login },
+  { path: '/game', component: Game },
+  { path: '/', component: Login },
   { path: '/screen', component: Screen }
 ]
 

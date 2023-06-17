@@ -1,25 +1,41 @@
 <template>
-  <div>
+  <h1>Флекспатруль мультиплеер</h1>
+
+  <div class="authCard">
     <h1>Авторизация:</h1>
-    <p>{{ question }}</p>
-    <input 
-      placeholder="Ответ"
-      v-model="answer"
-    >
-    <br>
-    <input
-      placeholder="Ваше имя"
-      v-model="username"
-    >
-    <br>
-    <button 
-      @click="login" 
-      :class="{ 
-        wrong: loggedIn === false
-      }"
-    >
-      Ввод
-    </button>
+
+    <div class="auth">
+      <p>{{ question }}</p>
+      <input 
+        placeholder="Ответ"
+        v-model="answer"
+      >
+      <input
+        v-if="mode === 'player'"
+        placeholder="Ваше имя"
+        v-model="username"
+      >
+      
+      <button 
+        v-if="mode === 'player'"
+        @click="loginPlayer" 
+      >
+        Войти как игрок
+      </button>
+      <button 
+        v-else
+        @click="loginScreen" 
+      >
+        Войти как большой экран
+      </button>
+      
+      <button 
+        @click="switchMode"
+        class="secondary"
+      >
+        Я не {{ mode === 'player' ? 'игрок' : 'большой экран' }}!
+      </button>
+    </div>
   </div>
 </template>
 
@@ -30,39 +46,54 @@ import useStore from '../../store'
 import axios from 'axios'
 axios.defaults.withCredentials = true
 
-const question = process.env.VUE_APP_QUESTION
+const question = import.meta.env.VITE_APP_QUESTION
 
 const router = useRouter()
 const store = useStore()
 
+const mode = ref("player")
 const answer = ref()
-const loggedIn = ref()
 const username = ref()
 
-async function login() {
+function switchMode() {
+  mode.value = mode.value === 'player' ? 'screen' : 'player'
+}
+
+async function loginPlayer() {
   store.username = username.value
 
   await axios
-    .post(process.env.VUE_APP_BACKEND + '/auth', {
+    .post(import.meta.env.VITE_APP_BACKEND + '/auth', {
+      "pass": answer.value,
+      "username": username.value,
+    })
+  
+  router.push('/game')
+}
+
+async function loginScreen() {
+  store.username = undefined
+
+  await axios
+    .post(import.meta.env.VITE_APP_BACKEND + '/auth', {
       "pass": answer.value,
     })
-    .then(response => {
-      loggedIn.value = response.status == "200"
-      router.push('/')
-    })
-
-  axios
-    .post(process.env.VUE_APP_BACKEND + '/connect', {
-      'data': {
-        'username': username.value
-      }
-    })
+  
+  router.push('/screen')
 }
 </script>
 
 <style scoped>
-div {
+.auth {
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.authCard {
   background-color: #121212;
+  color: white;
   width: 400px;
   margin: auto;
   border-radius: 18px;
@@ -74,7 +105,6 @@ input {
   font-size: 1em;
   text-align: center;
   padding: 5px 8px;
-  margin-bottom: 1em;
   border-radius: 6px;
   border: none;
   width: 20ch;
@@ -90,6 +120,11 @@ button {
   width: 20ch;
   padding: 5px 8px;
   cursor: pointer;
+}
+
+button.secondary {
+  background: #919191;
+  font-size: 12px;
 }
 
 @media only screen and (max-width: 520px) {

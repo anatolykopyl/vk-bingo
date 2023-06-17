@@ -1,8 +1,17 @@
 <template>
   <div>
-    <span v-show="!correct" class="wrong">Нет, это был не {{ selectedName }} 😢</span>
-    <div class="result" v-bind:class="{correct: correct}">
-      {{ name }} {{ date }}
+    <div
+      class="result" 
+      :class="{correct: correct === selectedName}"
+    >
+      <div
+        v-show="correct !== selectedName" 
+        class="wrong"
+      >
+        Нет, это был не {{ selectedName }} 😢
+      </div>
+
+      {{ correct }}
     </div>
   </div>
 </template>
@@ -14,7 +23,7 @@ export default {
     name: String,
     selectedName: String,
     date: String,
-    correct: Boolean
+    correct: String
   }
 }
 </script>
@@ -23,12 +32,12 @@ export default {
 .result {
   padding: 30px 40px;
   border-radius: 8px;
-  background-color: #5a5a5a;
+  background-color: white;
 }
 
 .correct {
-  color: #121212;
-  background-color: rgb(124, 230, 124);
+  color: black;
+  background-color: var(--clr-accent);
 }
 
 .wrong {
