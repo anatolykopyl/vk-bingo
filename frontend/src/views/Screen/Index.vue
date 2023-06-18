@@ -140,6 +140,7 @@ addAnswerListener((data) => {
 })
 
 addUserlistListener((data) => {
+  users.value = []
   data.forEach((name) => {
     users.value.push({
       name,
