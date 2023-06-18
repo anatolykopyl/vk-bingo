@@ -10,31 +10,55 @@
 
     <div class="answersState">
       <div class="users -unanwsered">
-        <h2 class="usersTitle">Не ответили</h2>
+        <h2 class="usersTitle">
+          Не ответили
+        </h2>
         <ul>
           <li
-            class="user"
             v-for="user in unansweredPlayers"
             :key="user.name"
+            class="user"
           >
-            {{ user.name }}
+            <span>
+              {{ user.name }}
+            </span>
+            <span 
+              class="score"
+              :class="{
+                '-leader': leader === user.name
+              }"
+            >
+              {{ score[user.name] }}
+            </span>
           </li>
         </ul>
       </div>
 
       <div class="users">
-        <h2 class="usersTitle">Ответили</h2>
+        <h2 class="usersTitle">
+          Ответили
+        </h2>
         <ul>
           <li
-            class="user"
             v-for="user in answeredPlayers"
             :key="user.name"
+            class="user"
             :class="{
               '-wrong': correctAnswer && user.selected !== correctAnswer,
               '-correct': correctAnswer && user.selected === correctAnswer
             }"
           >
-            {{ user.name }}
+            <span>
+              {{ user.name }}
+            </span>
+            <span 
+              class="score"
+              :class="{
+                '-leader': leader === user.name
+              }"
+            >
+              {{ score[user.name] }}
+            </span>
           </li>
         </ul>
       </div>
@@ -67,6 +91,7 @@ const card = ref()
 const users = ref([])
 const correctAnswer = ref()
 const loading = ref()
+const score = ref({})
 
 async function getCard() {
   loading.value = true
@@ -93,6 +118,12 @@ const unansweredPlayers = computed(() => {
   return users.value.filter((user) => !user.selected)
 })
 
+const leader = computed(() => {
+  return Object.keys(score.value).sort((a, b) => {
+    return score.value[a] - score.value[b]
+  })[0]
+})
+
 addAnswerListener((data) => {
   users.value = users.value.map((user) => {
     if (user.name === data.username) {
@@ -117,6 +148,7 @@ addUserlistListener((data) => {
 
 addRevealListener((data) => {
   correctAnswer.value = data.correctAnswer
+  score.value = data.score
 
   setTimeout(() => {
     getCard()
@@ -191,12 +223,36 @@ onMounted(() => {
   border-right: 1px dashed var(--clr-text);
 }
 
+.user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .user.-correct {
   color: green;
 }
 
 .user.-wrong {
   color: red;
+}
+
+.score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  width: 16px;
+  height: 16px;
+  border-radius: 64px;
+  border: 2px solid var(--clr-text);
+  background: var(--clr-bg);
+  color: var(--clr-text);
+
+  &.-leader {
+    background: var(--clr-accent);
+  }
 }
 
 .usersTitle {

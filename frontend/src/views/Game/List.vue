@@ -3,13 +3,13 @@
     class="answers"
   >
     <span 
-      class="option" 
       v-for="name in options" 
       :key="name" 
-      @click="selectAnswer(name)"
+      class="option" 
       :class="{
         '-selected': selection === name
       }"
+      @click="selectAnswer(name)"
     >
       {{ name }}
     </span>
