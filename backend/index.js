@@ -8,7 +8,7 @@ import { createNanoEvents } from 'nanoevents';
 
 import "dotenv/config";
 
-import names from './names.json' assert { type: "json" };
+import names from './names'
 
 const app = express();
 
@@ -175,6 +175,7 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
     });
 
     players[req.body.data.username] = req.body.data.name;
+    answers += 1
     emitter.emit('answer', {
       username: req.body.data.username,
       selected: req.body.data.name
@@ -282,8 +283,6 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
       }
 
       res.write(`data: ${JSON.stringify(data)}\nevent: answer\n\n`);
-
-      answers += 1
 
       if (answers === Object.keys(players).length) {
         Object.keys(players).forEach((key) => {

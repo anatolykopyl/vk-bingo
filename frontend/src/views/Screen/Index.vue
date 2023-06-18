@@ -23,6 +23,7 @@
               {{ user.name }}
             </span>
             <span 
+              v-if="score[user.name]"
               class="score"
               :class="{
                 '-leader': leader === user.name
@@ -52,6 +53,7 @@
               {{ user.name }}
             </span>
             <span 
+              v-if="score[user.name]"
               class="score"
               :class="{
                 '-leader': leader === user.name
