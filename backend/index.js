@@ -3,7 +3,6 @@ import session from 'express-session';
 import mongodb from 'mongodb';
 import MongoStore from 'connect-mongo';
 import cors from 'cors';
-import crypto from 'crypto'
 import { createNanoEvents } from 'nanoevents';
 
 import "dotenv/config";
@@ -117,7 +116,7 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
       emitter.emit('connection', Object.keys(players))
     }
 
-    if (pass && pass.toLowerCase() === process.env.PASSWORD) {
+    if (pass && pass.toLowerCase().trim() === process.env.PASSWORD) {
       req.session.loggedIn = true;
       return res.status(200).send('Logged in');
     } else {
@@ -254,12 +253,15 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
     }
 
     players = {}
+    answers = 0
+    score = {}
+
+    emitter.emit("end")
+
     return res.status(200).send();
   });
 
   app.get('/api/stream', async (req, res) => {
-    const id = crypto.randomUUID()
-
     res.set({
       'Access-Control-Allow-Origin': '*',
       'Cache-Control': 'no-cache',
@@ -298,17 +300,22 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
         oldCard = { ...card }
         card = await drawCard()
         
-        emitter.emit(`allDone-${id}`);
+        emitter.emit("allDone");
       }
     });
 
-    const unbindAllDone = emitter.on(`allDone-${id}`, () => {
+    emitter.on("allDone", () => {
       const data = {
         correctAnswer: oldCard.name,
         score
       }
       res.write(`data: ${JSON.stringify(data)}\nevent: reveal\n\n`);
     });
+
+    emitter.on("end", () => {
+      res.write(`event: end\n\n`);
+      res.end();
+    })
 
     res.on('close', () => {
       res.end();

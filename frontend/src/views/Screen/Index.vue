@@ -82,12 +82,14 @@
 <script setup>
 import axios from 'axios'
 import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import useServerEvents from '@/composables/useServerEvents'
 import Answer from './Answer.vue'
 
 import SquareLoader from 'vue-spinner/src/SquareLoader.vue'
 
-const { addAnswerListener, addUserlistListener, addRevealListener } = useServerEvents()
+const { addAnswerListener, addUserlistListener, addRevealListener, addEndListener } = useServerEvents()
+const router = useRouter()
 
 const card = ref()
 const users = ref([])
@@ -161,6 +163,10 @@ addRevealListener((data) => {
       selected: null
     }))
   }, 5000)
+})
+
+addEndListener(() => {
+  router.push('/')
 })
 
 onMounted(() => {

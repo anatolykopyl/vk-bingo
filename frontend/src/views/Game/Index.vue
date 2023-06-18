@@ -1,10 +1,12 @@
 <template>
-  <h1 class="header">Флекспатруль мультиплеер</h1>
+  <h1 class="header">
+    Флекспатруль мультиплеер
+  </h1>
 
   <div class="main">
     <div 
-      class="card" 
-      v-if="card"
+      v-if="card" 
+      class="card"
     >
       <img 
         class="meme" 
@@ -12,7 +14,10 @@
       >
       <h2>Кто скинул этот мем?</h2>
       <div class="interactive">
-        <transition name="fade-answers" mode="out-in">
+        <transition
+          name="fade-answers"
+          mode="out-in"
+        >
           <List
             v-if="!showResult"
             :options="options" 
@@ -20,7 +25,7 @@
           />
           <Result 
             v-else 
-            :selectedName="selectedAnswer" 
+            :selected-name="selectedAnswer" 
             :correct="correctAnswer"
           />
         </transition>
@@ -39,6 +44,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 import List from './List.vue'
 import Result from './Result.vue'
@@ -49,7 +55,8 @@ import useServerEvents from '@/composables/useServerEvents'
 import SquareLoader from 'vue-spinner/src/SquareLoader.vue'
 
 const store = useStore()
-const { addRevealListener } = useServerEvents()
+const router = useRouter()
+const { addRevealListener, addEndListener } = useServerEvents()
 
 const options = ref()
 const card = ref()
@@ -64,6 +71,10 @@ addRevealListener((data) => {
   setTimeout(() => {
     getCard()
   }, 5000)
+})
+
+addEndListener(() => {
+  router.push('/')
 })
 
 async function getCard() {

@@ -17,5 +17,9 @@ export default () => {
     evtSource.addEventListener('reveal', (event) => handler(JSON.parse(event.data)))
   }
 
-  return { addAnswerListener, addUserlistListener, addRevealListener }
+  function addEndListener(handler) {
+    evtSource.addEventListener('end', (event) => handler(JSON.parse(event.data)))
+  }
+
+  return { addAnswerListener, addUserlistListener, addRevealListener, addEndListener }
 }
