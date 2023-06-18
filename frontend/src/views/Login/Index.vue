@@ -5,14 +5,14 @@
     <div class="auth">
       <p>{{ question }}</p>
       <input 
-        placeholder="Ответ"
         v-model="answer"
+        placeholder="Ответ"
         class="input"
       >
       <input
         v-if="mode === 'player'"
-        placeholder="Ваше имя"
         v-model="username"
+        placeholder="Ваше имя"
         class="input"
       >
       
@@ -32,8 +32,8 @@
       </button>
       
       <button 
-        @click="switchMode"
         class="switchMode"
+        @click="switchMode"
       >
         Я не {{ mode === 'player' ? 'игрок' : 'большой экран' }}!
       </button>
@@ -160,8 +160,9 @@ async function loginScreen() {
 
 @media only screen and (max-width: 520px) {
   .authCard {
-    width: 100%;
-    padding: 40px 0;
+    width: calc(100% - 90px);
+    margin: auto;
+    padding: 40px 20px;
   }
 }
 </style>
