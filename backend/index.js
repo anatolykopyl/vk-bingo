@@ -313,7 +313,7 @@ const client = new MongoClient(process.env.URI, { useUnifiedTopology: true });
     });
 
     emitter.on("end", () => {
-      res.write(`event: end\n\n`);
+      res.write(`data: {}\nevent: end\n\n`);
       res.end();
     })
 

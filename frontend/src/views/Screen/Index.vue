@@ -3,10 +3,22 @@
     v-if="card && !loading"
     class="bigScreen"
   >
-    <img
-      class="image"
-      :src="card.image"
-    >
+    <div class="leftWrapper">
+      <div class="left">
+        <Answer 
+          v-if="correctAnswer"
+          :answer="correctAnswer"
+        />
+        
+        <img
+          class="image"
+          :class="{
+            '-scoot': correctAnswer
+          }"
+          :src="card.image"
+        >
+      </div>
+    </div>
 
     <div class="answersState">
       <div class="users -unanwsered">
@@ -26,7 +38,7 @@
               v-if="score[user.name]"
               class="score"
               :class="{
-                '-leader': leader === user.name
+                '-leader': score[user.name] === maxScore
               }"
             >
               {{ score[user.name] }}
@@ -56,7 +68,7 @@
               v-if="score[user.name]"
               class="score"
               :class="{
-                '-leader': leader === user.name
+                '-leader': score[user.name] === maxScore
               }"
             >
               {{ score[user.name] }}
@@ -65,11 +77,6 @@
         </ul>
       </div>
     </div>
-
-    <Answer 
-      v-if="correctAnswer"
-      :answer="correctAnswer"
-    />
   </div>
 
   <square-loader 
@@ -77,6 +84,9 @@
     :color="'white'"
     class="loader"
   />
+
+  <Countdown v-if="correctAnswer" />
+  <!-- <FunFact /> -->
 </template>
 
 <script setup>
@@ -85,8 +95,10 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import useServerEvents from '@/composables/useServerEvents'
 import Answer from './Answer.vue'
+// import FunFact from './FunFact.vue'
 
 import SquareLoader from 'vue-spinner/src/SquareLoader.vue'
+import Countdown from '@/components/Countdown.vue'
 
 const { addAnswerListener, addUserlistListener, addRevealListener, addEndListener } = useServerEvents()
 const router = useRouter()
@@ -122,10 +134,11 @@ const unansweredPlayers = computed(() => {
   return users.value.filter((user) => !user.selected)
 })
 
-const leader = computed(() => {
-  return Object.keys(score.value).sort((a, b) => {
+const maxScore = computed(() => {
+  const leader = Object.keys(score.value).sort((a, b) => {
     return score.value[b] - score.value[a]
   })[0]
+  return score.value[leader]
 })
 
 addAnswerListener((data) => {
@@ -192,22 +205,45 @@ onMounted(() => {
   color: var(--clr-text);
 }
 
+.leftWrapper {
+  position: relative;
+  height: 100%;
+  max-width: 60%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.left {
+  position: relative;
+  max-height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .image {
   display: block;
-  max-width: 60%;
+  max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  margin-top: auto;
-  margin-bottom: auto;
   background: var(--clr-text);
   border: 3px solid var(--clr-text);
   @include filled-shadow(16);
   border-radius: 64px;
-  animation-name: rock;
-  animation-duration: 5s;
-  animation-direction: alternate;
-  animation-iteration-count: infinite;
-  animation-timing-function: ease-in-out;
+  // animation-name: rock;
+  // animation-duration: 5s;
+  // animation-direction: alternate;
+  // animation-iteration-count: infinite;
+  // animation-timing-function: ease-in-out;
+  transition: transform 1s;
+
+  &.-scoot {
+    transform: translateY(150px);
+  }
 }
 
 @keyframes rock {
@@ -236,6 +272,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-bottom: 8px;
 }
 
 .user.-correct {

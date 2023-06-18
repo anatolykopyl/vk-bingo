@@ -34,6 +34,8 @@
 
     <EndGame />
 
+    <Countdown v-if="correctAnswer" />
+
     <square-loader 
       v-if="!card" 
       :color="'white'" 
@@ -51,6 +53,7 @@ import Result from './Result.vue'
 import EndGame from './EndGame.vue'
 import useStore from '@/store'
 import useServerEvents from '@/composables/useServerEvents'
+import Countdown from '@/components/Countdown.vue'
 
 import SquareLoader from 'vue-spinner/src/SquareLoader.vue'
 

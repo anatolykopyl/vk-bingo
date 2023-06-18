@@ -1,8 +1,8 @@
 <template>
   <div class="end">
     <button 
-      @click="endGame"
       class="endButton"
+      @click="endGame"
     >
       Закончить игру
     </button>
@@ -32,6 +32,7 @@ function endGame() {
   background: none;
   border: none;
   font: inherit;
+  color: var(--clr-text);
   padding: 8px 12px;
   border-bottom: 1px dotted var(--clr-text);
 

@@ -27,8 +27,10 @@
 
 :root {
   --clr-bg: #ffd537;
+  --clr-bg-secondary: #fbf2cf;
   --clr-accent: #37ffac;
   --clr-text: #141414;
+  --clr-text-secondary: rgb(20, 20, 20, .5);
 }
 
 body {

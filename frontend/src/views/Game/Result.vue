@@ -28,11 +28,14 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .result {
   padding: 30px 40px;
   border-radius: 32px;
   background-color: white;
+  font-weight: 600;
+  border: 3px solid var(--clr-text);
+  @include filled-shadow(16);
 }
 
 .correct {

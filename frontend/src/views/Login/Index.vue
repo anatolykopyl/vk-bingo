@@ -4,11 +4,16 @@
 
     <div class="auth">
       <p>{{ question }}</p>
+
       <input 
         v-model="answer"
         placeholder="Ответ"
         class="input"
+        :class="{
+          '-wrong': wrongPassword
+        }"
       >
+
       <input
         v-if="mode === 'player'"
         v-model="username"
@@ -19,13 +24,15 @@
       <button 
         v-if="mode === 'player'"
         class="login"
-        @click="loginPlayer" 
+        :disabled="!username || !answer" 
+        @click="loginPlayer"
       >
         Войти как игрок
       </button>
       <button 
         v-else
         class="login"
+        :disabled="!answer" 
         @click="loginScreen" 
       >
         Войти как большой экран
@@ -56,6 +63,7 @@ const store = useStore()
 const mode = ref("player")
 const answer = ref()
 const username = ref()
+const wrongPassword = ref()
 
 function switchMode() {
   mode.value = mode.value === 'player' ? 'screen' : 'player'
@@ -68,24 +76,32 @@ async function loginPlayer() {
 
   store.username = username.value
 
-  await axios
-    .post(import.meta.env.VITE_APP_BACKEND + '/auth', {
-      "pass": answer.value,
-      "username": username.value,
-    })
-  
-  router.push('/game')
+  try {
+    await axios
+      .post(import.meta.env.VITE_APP_BACKEND + '/auth', {
+        "pass": answer.value,
+        "username": username.value,
+      })
+
+    router.push('/game')
+  } catch {
+    wrongPassword.value = true
+  }
 }
 
 async function loginScreen() {
   store.username = undefined
 
-  await axios
-    .post(import.meta.env.VITE_APP_BACKEND + '/auth', {
-      "pass": answer.value,
-    })
-  
-  router.push('/screen')
+  try {
+    await axios
+      .post(import.meta.env.VITE_APP_BACKEND + '/auth', {
+        "pass": answer.value,
+      })
+
+    router.push('/screen')
+  } catch {
+    wrongPassword.value = true
+  }
 }
 </script>
 
@@ -126,6 +142,10 @@ async function loginScreen() {
   &:focus {
     outline: none;
   }
+
+  &.-wrong {
+    border-color: red;
+  }
 }
 
 .login {
@@ -140,6 +160,11 @@ async function loginScreen() {
   border: 2px solid var(--clr-text);
   @include filled-shadow(4);
   border-radius: 12px;
+
+  &:disabled {
+    cursor: default;
+    color: var(--clr-text-secondary);
+  }
 }
 
 .switchMode {
@@ -154,6 +179,9 @@ async function loginScreen() {
   left: 0;
   bottom: 0;
   transform: translate(-50%, 50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
   @include filled-shadow(4);
 }
