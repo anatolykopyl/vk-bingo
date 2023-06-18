@@ -8,7 +8,7 @@ import { createNanoEvents } from 'nanoevents';
 
 import "dotenv/config";
 
-import names from './names'
+import names from './names.js'
 
 const app = express();
 
