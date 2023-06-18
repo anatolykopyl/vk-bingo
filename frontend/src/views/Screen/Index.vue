@@ -124,7 +124,7 @@ const unansweredPlayers = computed(() => {
 
 const leader = computed(() => {
   return Object.keys(score.value).sort((a, b) => {
-    return score.value[a] - score.value[b]
+    return score.value[b] - score.value[a]
   })[0]
 })
 
