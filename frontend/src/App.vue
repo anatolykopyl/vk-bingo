@@ -30,7 +30,7 @@
   --clr-bg-secondary: #fbf2cf;
   --clr-accent: #37ffac;
   --clr-text: #141414;
-  --clr-text-secondary: rgb(20, 20, 20, .5);
+  --clr-text-secondary: #14141480;
 }
 
 body {

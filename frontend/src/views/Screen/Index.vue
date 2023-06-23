@@ -87,11 +87,19 @@
 
   <Countdown v-if="correctAnswer" />
   <!-- <FunFact /> -->
+  <Transition name="slide-out">
+    <div 
+      v-if="hurryLast"
+      class="hurryLast"
+    >
+      {{ lastPlayer.name }}, поторопись!
+    </div>
+  </Transition>
 </template>
 
 <script setup>
 import axios from 'axios'
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import useServerEvents from '@/composables/useServerEvents'
 import Answer from './Answer.vue'
@@ -108,6 +116,7 @@ const users = ref([])
 const correctAnswer = ref()
 const loading = ref()
 const score = ref({})
+const hurryLast = ref()
 
 async function getCard() {
   loading.value = true
@@ -141,6 +150,26 @@ const maxScore = computed(() => {
   return score.value[leader]
 })
 
+const lastPlayer = computed(() => {
+  if (unansweredPlayers.value.length === 1) {
+    return unansweredPlayers.value[0]
+  }
+
+  return null
+})
+
+let countdownToHurry = undefined
+watch(lastPlayer, () => {
+  if (!lastPlayer.value) {
+    clearTimeout(countdownToHurry)
+    hurryLast.value = false
+  } else {
+    countdownToHurry = setTimeout(() => {
+      hurryLast.value = true
+    }, 5000)
+  }
+})
+
 addAnswerListener((data) => {
   users.value = users.value.map((user) => {
     if (user.name === data.username) {
@@ -167,6 +196,9 @@ addUserlistListener((data) => {
 addRevealListener((data) => {
   correctAnswer.value = data.correctAnswer
   score.value = data.score
+
+  clearTimeout(countdownToHurry)
+  hurryLast.value = false
 
   setTimeout(() => {
     getCard()
@@ -197,10 +229,9 @@ onMounted(() => {
   top: 0;
   display: flex;
   justify-content: space-evenly;
-  gap: 64px;
+  gap: 16px;
   align-items: center;
-  padding: 64px;
-  background: var(--clr-bg);
+  padding: 8px 8px 24px 8px;
   box-sizing: border-box;
   color: var(--clr-text);
 }
@@ -233,7 +264,7 @@ onMounted(() => {
   background: var(--clr-text);
   border: 3px solid var(--clr-text);
   @include filled-shadow(16);
-  border-radius: 64px;
+  border-radius: 16px;
   // animation-name: rock;
   // animation-duration: 5s;
   // animation-direction: alternate;
@@ -308,10 +339,43 @@ onMounted(() => {
 .answersState {
   display: flex;
   flex-shrink: 0;
-  height: 300px;
+  height: 400px;
+  font-size: 32px;
 }
 
 .loader {
   margin-top: 50%;
+}
+
+.hurryLast {
+  padding: 16px 32px;
+  border-radius: 16px;
+  font-size: 32px;
+  border: 3px solid var(--clr-text);
+  @include filled-shadow(16);
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  background: var(--clr-bg-secondary);
+  animation-name: pulse;
+  animation-delay: 10s;
+  animation-duration: 100s;
+  animation-fill-mode: forwards;
+  transition: transform 1s;
+}
+
+.slide-out-enter-from,
+.slide-out-leave-to {
+  transform: translateY(200px);
+}
+
+@keyframes pulse {
+  from {
+    background: var(--clr-bg-secondary);
+  }
+
+  to {
+    background: red;
+  }
 }
 </style>
