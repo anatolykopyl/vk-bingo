@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  flexpatrol-bingo:
+    image: git.radner.ru/anatolykopyl/flexpatrol-bingo:latest
+    container_name: flexpatrol-bingo
+    working_dir: /usr/node/app
+    ports:
+      - "3004:3000"
+    command: >
+      sh -c "node index.js"
